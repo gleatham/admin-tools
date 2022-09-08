@@ -1,0 +1,29 @@
+WA9522 | CHANGED | rc=0 >>
+Filesystem      Size  Used Avail Use% Mounted on
+devtmpfs        367M     0  367M   99% /dev
+tmpfs           403M     0  403M   0% /dev/shm
+tmpfs           403M   46M  357M  12% /run
+tmpfs           403M     0  403M   0% /sys/fs/cgroup
+/dev/vda1        25G  2.9G   23G  12% /
+tmpfs            81M     0   81M   0% /run/user/0
+test-server | CHANGED | rc=0 >>
+Filesystem      Size  Used Avail Use% Mounted on
+devtmpfs        367M     0  367M   0% /dev
+tmpfs           403M     0  403M   0% /dev/shm
+tmpfs           403M   46M  357M  12% /run
+tmpfs           403M     0  403M   0% /sys/fs/cgroup
+/dev/vda1        25G  2.9G   23G  12% /
+tmpfs            81M     0   81M   0% /run/user/0
+database-server | UNREACHABLE! => {
+    "changed": false,
+    "msg": "Failed...",
+    "unreachable": true
+}
+web-server | CHANGED | rc=0 >>
+Filesystem      Size  Used Avail Use% Mounted on
+devtmpfs        367M     0  367M   0% /dev
+tmpfs           403M     0  403M   0% /dev/shm
+tmpfs           403M   46M  357M  12% /run
+tmpfs           403M     0  403M  100% /sys/fs/cgroup
+/dev/vda1        25G  2.9G   23G  12% /
+tmpfs            81M     0   81M   0% /run/user/0
