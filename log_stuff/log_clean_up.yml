@@ -1,0 +1,17 @@
+---
+- name: Clean up audit logs
+  hosts: all
+  vars:
+
+  tasks:
+    - name: Run log-cleanup.sh
+      script: ./log_clean_up.sh
+
+
+- name: Clean up JPS logs
+  hosts: baradur-ofs systems
+  vars:
+
+  tasks:
+    - name: Run JPS log cleanup
+      script: ./log_clean_up_jps.sh

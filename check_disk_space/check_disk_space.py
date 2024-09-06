@@ -8,7 +8,7 @@ class CheckDiskspace:
     def get_name(self):
         print(f"Tool: {self.tool_name}")
 
-    def check_diskspace(self):
+    def check_disk_space(self):
         current_host = ""
         with open("df-output.txt", "r") as file:
             for line in file:
@@ -47,6 +47,6 @@ class CheckDiskspace:
         pass
 
     def run(self):
-        self.check_diskspace()
+        self.check_disk_space()
         # parse and check file
         # email alert if disks are full

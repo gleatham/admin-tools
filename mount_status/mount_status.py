@@ -1,7 +1,6 @@
 '''
 Author: Geoff Leatham
 Date: 12/29/2020
-Last modified: 12/29/2020
 
 This program checks the NFS share status and fixes it as needed.
 
@@ -30,14 +29,14 @@ def log(problem):
             mount()
         elif problem == 3:
             fout.write(date + " Incorrect permissions found\n")
-            changePermissions()
+            change_permissions()
         elif problem == 4:
             fout.write(date + " Failed to read from share\n")
             mount()
         fout.close()
 
         mount()
-    except:
+    except FileNotFoundError:
         return
 
     return
@@ -50,62 +49,61 @@ def mount():
     main()
 
 
-def changePermissions():
+def change_permissions():
     try:
         os.system('chown root:root /fakeNFS')
-    except:
+    except OSError:
         print("Failed to change permissions")
 
     main()
 
 
-def checkPermissions(cOwner, cGroup, path):
+def check_permissions(c_owner, c_group, path):
     try:
         owner = getpwuid(stat(path).st_uid).pw_name
         group = getpwuid(stat(path).st_gid).pw_name
 
-        if owner != cOwner or group != cGroup:
+        if owner != c_owner or group != c_group:
             log(3)
         else:
             return
-    except:
+    except OSError:
         print("Faile to check permissions")
 
 
-def checkWrite(writePath):
+def check_write(write_path):
     # write a small text file and remove it
     try:
-        fout = open(writePath, "w")
+        fout = open(write_path, "w")
         fout.write("This is a test")
         fout.close()
-    except:
+    except FileNotFoundError:
         log(2)
         mount()
 
     return
 
 
-def checkRead(writePath):
+def check_read(write_path):
     try:
-        fin = open(writePath, "r")
-        line = fin.readline()
+        fin = open(write_path, "r")
+        line = fin.readline() # Why did I do this?
         fin.close()
-    except:
-        fin.close()
+    except FileNotFoundError:
         log(4)
 
 
-def checkMount(path):
+def check_mount(path):
     # returns true if the disk is mounted
     try:
-        isPath = os.path.ismount(path)
-        if isPath:
+        is_path = os.path.ismount(path)
+        if is_path:
             return
         else:
             log(1)
             mount()
 
-    except:
+    except RuntimeError:
         print("Fatal error: Failed to check mount status")
 
     return
@@ -115,13 +113,13 @@ def main():
     # It will write first then read in order to have a file to read.
 
     path = "/fakeNFS"
-    writePath = "/fakeNFS/testWrite.txt"
+    write_path = "/fakeNFS/testWrite.txt"
     owner = "root"
     group = "root"
-    checkMount(path)
-    checkWrite(writePath)
-    checkRead(writePath)
-    checkPermissions(owner, group, path)
+    check_mount(path)
+    check_write(write_path)
+    check_read(write_path)
+    check_permissions(owner, group, path)
 
 
 if __name__ == "__main__":
