@@ -13,7 +13,7 @@ def create_hash(directory, num_directories):
     new_hash = {}
     directory = directory
     num_directories = num_directories
-    # TODO: Read the comment below
+    # TODO: Read the comment below, verify it was fixed without before deleting
     #keys = [] I'm not sure why this was originally there but I think it was failing without it.
     keys = list(directory.keys())
 

@@ -44,6 +44,7 @@ class CheckDiskspace:
 
     def send_email(self):
         # TODO: send email only if data has been written to the file
+        # TODO: Add boomer mail
         pass
 
     def run(self):

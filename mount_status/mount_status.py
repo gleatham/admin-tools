@@ -1,4 +1,4 @@
-'''
+"""
 Author: Geoff Leatham
 Date: 12/29/2020
 
@@ -7,7 +7,7 @@ This program checks the NFS share status and fixes it as needed.
 Variables are hard coded in two places:
 -main()
 -mount()
-'''
+"""
 
 import os
 from pwd import getpwuid

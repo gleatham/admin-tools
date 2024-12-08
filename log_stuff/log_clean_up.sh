@@ -2,12 +2,12 @@
 
 backup_audit_log() {
 	now=$(date '+%Y-%m-%d')
-	cd /var/log/audit/
+	cd /var/log/audit/ || exit
 	echo "creating tarball"
-	tar -cvzf audit-log-$now.tar.gz audit.log
+	tar -cvzf audit-log-"$now".tar.gz audit.log
 
 	echo "Copyihng tarball to /home/scanuser/..."
-	mv ./audit-log-$now.tar.gz /home/scanuser/audit-log-backup/audit-log-$now.tar.gz
+	mv ./audit-log-"$now".tar.gz /home/scanuser/audit-log-backup/audit-log-"$now".tar.gz
 }
 
 clear_audit_log() {
