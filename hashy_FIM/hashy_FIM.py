@@ -1,3 +1,15 @@
+"""
+Reads dirs from a text file. Put the path to the file in main if not using the linux dialog gui. Default path is
+"./dirs.txt".
+Add dirs to the file in the following manner:
+key:path:null:
+key - Short name, usually folder.
+path - Absolute path works the best.
+null - null will be automatically replaced with the hash, if you make changes to a directory delete the hash
+        and put null in its place. A new hash will be generated and will be reported as a pass.
+            NOTE: Store this file in a safe location, if it can be tampered with then the hashing process is useless.
+"""
+
 import os
 import hashlib
 from datetime import datetime
@@ -13,15 +25,13 @@ def create_hash(directory, num_directories):
     new_hash = {}
     directory = directory
     num_directories = num_directories
-    # TODO: Read the comment below, verify it was fixed without before deleting
-    #keys = [] I'm not sure why this was originally there but I think it was failing without it.
     keys = list(directory.keys())
 
     # TODO: Change to for loop
     count = 0
     while count < num_directories:
         temp_dir = directory.get(keys[count])
-        sha_hash = hashlib.md5()
+        sha_hash = hashlib.sha512()
         try:
             for root, dirs, files in os.walk(temp_dir):
                 for names in files:
@@ -39,7 +49,7 @@ def create_hash(directory, num_directories):
                         buf = fin.read(4096)
                         if not buf:
                             break
-                        sha_hash.update(hashlib.md5(buf).digest())
+                        sha_hash.update(hashlib.sha512(buf).digest())
 
                     fin.close()
 
@@ -67,11 +77,16 @@ def write_new_hash(file_path, directories, hashes, num_directories):
             if hashes.get(keys[count]) == 'null':
                 need_update = True
                 new_key = create_hash(directories, num_directories)
-                hashes.update({keys[count]: new_key.get(keys[count]).hexdigest()})
+                try:
+                    hashes.update({keys[count]: new_key.get(keys[count]).hexdigest()})
+                except AttributeError as e:
+                    print(f"AttributeError: {e}")
+                    return
+
             count+=1
 
 
-    except IndexError:
+    except AttributeError as e:
         import traceback
         traceback.print_exc(limit=None, file=None, chain=True)
         return -2
@@ -112,7 +127,7 @@ def write_new_hash(file_path, directories, hashes, num_directories):
     return 0
 
 '''
-Reads in a directory path from a file.
+Reads in a directory path from a file and adds it to the directories{} list.
 Directory path is used in createHash()
 '''
 def get_directory(file_path):
@@ -124,9 +139,12 @@ def get_directory(file_path):
 
             for counter in range(len(directories_list)):
                 temp_dir_list = directories_list[counter].split(':', 3)
-                if temp_dir_list[0][0] != "#":
-                    directories.update({temp_dir_list[0]: temp_dir_list[1]})
-                counter += 1
+                try:
+                    if temp_dir_list[0][0] != "#":
+                        directories.update({temp_dir_list[0]: temp_dir_list[1]})
+                    counter += 1
+                except IndexError as e:
+                    directories.update({"'": temp_dir_list[1]})
 
     except NotADirectoryError:
         print("getDirectory() failed")
@@ -135,7 +153,6 @@ def get_directory(file_path):
         return -2
 
     return directories
-
 
 '''
 Reads file to get keys and hashes
@@ -148,9 +165,12 @@ def get_hashes(file_path):
 
             for counter in range(len(hashes_list)):
                 temp_hash_list = hashes_list[counter].split(':', 3)
-                if temp_hash_list[0][0] != "#":
-                    hashes.update({temp_hash_list[0]: temp_hash_list[2]})
-                counter+=1
+                try:
+                    if temp_hash_list[0][0] != "#":
+                        hashes.update({temp_hash_list[0]: temp_hash_list[2]})
+                    counter+=1
+                except IndexError as e:
+                    hashes.update({counter: temp_hash_list[2]})
     except FileNotFoundError:
         print("getHashes() Failed")
         import traceback
@@ -181,31 +201,35 @@ def compare_hash(hashes, new_hash, num_directories):
         count+=1
 
     return compare_results
+
 '''
 Writes data to log based on whether hashes match or not
 '''
 def write_log(compare_results, directories):
     date = datetime.today()
-    date = date.strftime('%Y-%m-%d')
+    date = date.strftime('%Y-%m-%d-%H-%M')
 
-    file = 'C:\\Users\\Geoff\\Documents\\hashTest\\' + 'log' + date + '.txt'
+    # TODO: Remove hard coded path
+    file = f'hash_logs/FIM-log-{date}.txt'
+    print(file)
+    #os.makedirs(file, exist_ok=True)
 
-    fout = open(file, 'w')
-    log_header = "Directory hash report for: " + date + '\n'
-    fout.write(log_header)
-    fout.close()
+    with open(file, 'w') as fout:
+        log_header = "Directory hash report for: " + date + '\n'
+        fout.write(log_header)
+        fout.close()
 
     try:
-        fout = open(file, 'a')
+        with open(file, 'a') as fout:
 
 
-        for name, value in compare_results.items():
-            if value:
-                value = "PASS"
-            else:
-                value = "**FAILED HASH**"
-            data = (name + "  :" + directories.get(str(name)) + "..." + str(value) + '\n')
-            fout.write(data)
+            for name, value in compare_results.items():
+                if value:
+                    value = "PASS"
+                else:
+                    value = "**FAILED HASH**"
+                data = (name + "  :" + directories.get(str(name)) + "..." + str(value) + '\n')
+                fout.write(data)
 
     except FileNotFoundError:
         print("write_log() Failed")
@@ -215,10 +239,17 @@ def write_log(compare_results, directories):
 
     return 0
 
+def get_paths_from_q_dialog():
+    # TODO: Write this in BASH?
+    pass
+
 
 def main():
     #add function at top to get filepath
-    file_path = 'C:\\Users\\Geoff\\Documents\\hashTest\\directories.txt'
+    file_path = './dirs.txt'
+
+    # TODO: Make it so the path can be added through the q-dialog gui.
+    back_up_location = ''
 
     #Dictionaries for directory path and hash
     directories = get_directory(file_path)

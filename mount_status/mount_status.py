@@ -68,7 +68,7 @@ def check_permissions(c_owner, c_group, path):
         else:
             return
     except OSError:
-        print("Faile to check permissions")
+        print("Failed to check permissions")
 
 
 def check_write(write_path):

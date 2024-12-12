@@ -9,6 +9,15 @@ class CheckDiskspace:
         print(f"Tool: {self.tool_name}")
 
     def check_disk_space(self):
+        """
+        Use df to check disk space on linux.
+
+        Args:
+            None
+
+        Returns:
+            None
+        """
         current_host = ""
         with open("df-output.txt", "r") as file:
             for line in file:
